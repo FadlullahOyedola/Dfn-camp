@@ -61,35 +61,51 @@
         </form>
     </main>
 
-    <script>
-        document.getElementById("registrationForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Stop the form from submitting normally
+<script>
+    document.getElementById("registrationForm").addEventListener("submit", async function(event) {
+        event.preventDefault(); // Stop the form from submitting normally
 
-            const name = document.getElementById("name").value.trim();
-            const email = document.getElementById("email").value.trim();
-            const number = document.getElementById("number").value.trim();
-            const age = document.getElementById("age").value.trim();
-            const gender = document.getElementById("gender").value;
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const number = document.getElementById("number").value.trim();
+        const age = document.getElementById("age").value.trim();
+        const gender = document.getElementById("gender").value;
 
-            // Check if any field is empty
-            if (!name || !email || !number || !age || !gender) {
-                alert("⚠️ Please fill in all fields before submitting.");
-                return;
-            }
+        // Check if any field is empty
+        if (!name || !email || !number || !age || !gender) {
+            alert("⚠️ Please fill in all fields before submitting.");
+            return;
+        }
 
-            // Simple email format validation
-            const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-            if (!email.match(emailPattern)) {
-                alert("⚠️ Please enter a valid email address.");
-                return;
-            }
+        // Simple email format validation
+        const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+        if (!email.match(emailPattern)) {
+            alert("⚠️ Please enter a valid email address.");
+            return;
+        }
 
-            // Redirect to the dashboard page after a slight delay
-            setTimeout(() => {
+        const formData = { name, email, number, age, gender };
+
+        try {
+            const response = await fetch('/.netlify/functions/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                // Redirect to the dashboard page after a successful submission
                 window.location.href = "dashboard.html";
-            }, 500); // Redirect after 0.5 seconds
-        });
-    </script>
+            } else {
+                const error = await response.json();
+                alert(`🚫 Registration failed: ${error.error}`);
+            }
+
+        } catch (error) {
+            alert("🚫 An error occurred. Please try again.");
+        }
+    });
+</script>
 
 </body>
 </html>
